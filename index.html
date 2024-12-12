@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anna e Cicero</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            display: grid;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url(./assets/soft-gradient-abstract-in-pastel-purple-and-pink-colors-gradient-background-blurred-gradient-texture-decorative-element-wallpaper-vector.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 0 20px;
+        }
+
+        .image-casal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-casal img{
+            width: 150px;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(114, 6, 153, 0.426);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            display: flex;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            background: rgb(156, 99, 186);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            min-width: 100px;
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .time-box label {
+            font-size: 1rem;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #ff758c;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #ff5c7a;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="image-casal">
+        <img src="./assets/WhatsApp_Image_2024-12-12_at_10.02.17-removebg-preview.png" alt="Anna e Cicero">
+    </div>
+    <div class="container">
+        <h1>Anna e Cicero estão namorando há:</h1>
+        <div class="timer" id="timer">
+            <div class="time-box">
+                <span id="days">00</span>
+                <label>Dias</label>
+            </div>
+            <div class="time-box">
+                <span id="hours">00</span>
+                <label>Horas</label>
+            </div>
+            <div class="time-box">
+                <span id="minutes">00</span>
+                <label>Minutos</label>
+            </div>
+            <div class="time-box">
+                <span id="seconds">00</span>
+                <label>Segundos</label>
+            </div>
+        </div>
+        <div class="buttons">
+            <button id="reset">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        let resetButton = document.getElementById('reset');
+        let daysElement = document.getElementById('days');
+        let hoursElement = document.getElementById('hours');
+        let minutesElement = document.getElementById('minutes');
+        let secondsElement = document.getElementById('seconds');
+
+        let interval;
+        let totalSeconds = parseInt(localStorage.getItem('totalSeconds')) || 0;
+
+        function updateTimer() {
+            let days = Math.floor((totalSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
+            let hours = Math.floor((totalSeconds % (24 * 60 * 60)) / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            daysElement.textContent = String(days).padStart(2, '0');
+            hoursElement.textContent = String(hours).padStart(2, '0');
+            minutesElement.textContent = String(minutes).padStart(2, '0');
+            secondsElement.textContent = String(seconds).padStart(2, '0');
+        }
+
+        function sendToServer(seconds) {
+            fetch('https://seuservidor.com/salvar-cronometro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ totalSeconds: seconds })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Erro ao salvar no servidor:', response.statusText);
+                }
+            })
+            .catch(error => console.error('Erro na requisição:', error));
+        }
+
+        function startTimer() {
+            interval = setInterval(() => {
+                totalSeconds++;
+                localStorage.setItem('totalSeconds', totalSeconds);
+                updateTimer();
+
+                // Enviar para o servidor a cada 10 segundos
+                if (totalSeconds % 10 === 0) {
+                    sendToServer(totalSeconds);
+                }
+            }, 1000); // 1 segundo em milissegundos
+        }
+
+        resetButton.addEventListener('click', () => {
+            clearInterval(interval);
+            totalSeconds = 0;
+            localStorage.setItem('totalSeconds', totalSeconds);
+            updateTimer();
+            sendToServer(totalSeconds);
+            startTimer();
+        });
+
+        // Atualiza o cronômetro com o valor armazenado e inicia automaticamente
+        updateTimer();
+        startTimer();
+    </script>
+</body>
+</html>
