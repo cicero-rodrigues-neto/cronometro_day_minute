@@ -120,13 +120,13 @@
             transition: background 0.3s;
         }
 
-        button:hover {
+        /* button:hover {
             background: #ff5c7a;
         }
 
         button:active {
             transform: scale(0.95);
-        }
+        } */
     </style>
 </head>
 <body>
@@ -153,26 +153,34 @@
                 <label>Segundos</label>
             </div>
         </div>
-        <div class="buttons">
+        <!-- <div class="buttons">
             <button id="reset">Reiniciar</button>
-        </div>
+        </div> -->
     </div>
 
     <script>
-        let resetButton = document.getElementById('reset');
         let daysElement = document.getElementById('days');
         let hoursElement = document.getElementById('hours');
         let minutesElement = document.getElementById('minutes');
         let secondsElement = document.getElementById('seconds');
 
-        let interval;
-        let totalSeconds = parseInt(localStorage.getItem('totalSeconds')) || 0;
+        // Recuperar a data de início ou definir agora
+        let startTime = localStorage.getItem('startTime');
+        if (!startTime) {
+            startTime = new Date().toISOString();
+            localStorage.setItem('startTime', startTime);
+        } else {
+            startTime = new Date(startTime);
+        }
 
         function updateTimer() {
-            let days = Math.floor((totalSeconds % (30 * 24 * 60 * 60)) / (24 * 60 * 60));
-            let hours = Math.floor((totalSeconds % (24 * 60 * 60)) / 3600);
-            let minutes = Math.floor((totalSeconds % 3600) / 60);
-            let seconds = totalSeconds % 60;
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000); // Tempo total em segundos
+
+            let days = Math.floor(elapsed / (24 * 60 * 60));
+            let hours = Math.floor((elapsed % (24 * 60 * 60)) / 3600);
+            let minutes = Math.floor((elapsed % 3600) / 60);
+            let seconds = elapsed % 60;
 
             daysElement.textContent = String(days).padStart(2, '0');
             hoursElement.textContent = String(hours).padStart(2, '0');
@@ -180,13 +188,16 @@
             secondsElement.textContent = String(seconds).padStart(2, '0');
         }
 
-        function sendToServer(seconds) {
+        function sendToServer() {
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000);
+
             fetch('https://seuservidor.com/salvar-cronometro', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ totalSeconds: seconds })
+                body: JSON.stringify({ totalSeconds: elapsed })
             })
             .then(response => {
                 if (!response.ok) {
@@ -197,26 +208,23 @@
         }
 
         function startTimer() {
-            interval = setInterval(() => {
-                totalSeconds++;
-                localStorage.setItem('totalSeconds', totalSeconds);
+            setInterval(() => {
                 updateTimer();
 
-                // Enviar para o servidor a cada 10 segundos
-                if (totalSeconds % 10 === 0) {
-                    sendToServer(totalSeconds);
+                // Enviar para o servidor a cada 10 minutos
+                if (new Date().getSeconds() % 600 === 0) {
+                    sendToServer();
                 }
             }, 1000); // 1 segundo em milissegundos
         }
 
-        resetButton.addEventListener('click', () => {
-            clearInterval(interval);
-            totalSeconds = 0;
-            localStorage.setItem('totalSeconds', totalSeconds);
-            updateTimer();
-            sendToServer(totalSeconds);
-            startTimer();
-        });
+        // resetButton.addEventListener('click', () => {
+        //     localStorage.removeItem('startTime');
+        //     startTime = new Date().toISOString();
+        //     localStorage.setItem('startTime', startTime);
+        //     updateTimer();
+        //     sendToServer();
+        // });
 
         // Atualiza o cronômetro com o valor armazenado e inicia automaticamente
         updateTimer();
