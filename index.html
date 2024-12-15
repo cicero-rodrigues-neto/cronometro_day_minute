@@ -159,11 +159,13 @@
         </div>
         <div class="buttons">
             <button id="start">Iniciar</button>
+            <button id="reset">Resetar</button>
         </div>
     </div>
 
     <script>
         let startButton = document.getElementById('start');
+        let resetButton = document.getElementById('reset');
         let daysElement = document.getElementById('days');
         let hoursElement = document.getElementById('hours');
         let minutesElement = document.getElementById('minutes');
@@ -201,6 +203,14 @@
 
             // Esconder o botão iniciar
             startButton.style.display = 'none';
+            resetButton.style.display = 'block';
+        });
+
+        resetButton.addEventListener('click', () => {
+            localStorage.removeItem('startTime');
+            startTime = new Date().toISOString();
+            localStorage.setItem('startTime', startTime);
+            updateTimer();
         });
 
         // Se já existe um tempo salvo, iniciar automaticamente
@@ -208,6 +218,7 @@
             updateTimer();
             startTimer();
             startButton.style.display = 'none';
+            resetButton.style.display = 'block';
         }
     </script>
 </body>
