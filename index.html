@@ -102,7 +102,7 @@
             font-size: 1rem;
         }
 
-        .buttons {
+              .buttons {
             display: flex;
             justify-content: center;
             gap: 10px;
@@ -120,13 +120,17 @@
             transition: background 0.3s;
         }
 
-        /* button:hover {
+        button:hover {
             background: #ff5c7a;
         }
 
         button:active {
             transform: scale(0.95);
-        } */
+        }
+
+        #start {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -153,13 +157,13 @@
                 <label>Segundos</label>
             </div>
         </div>
-        <!-- <div class="buttons">
-            <button id="reset">Reiniciar</button>
-        </div> -->
+        <div class="buttons">
+            <button id="start">Iniciar</button>
+        </div>
     </div>
 
     <script>
-        // let resetButton = document.getElementById('reset');
+        let startButton = document.getElementById('start');
         let daysElement = document.getElementById('days');
         let hoursElement = document.getElementById('hours');
         let minutesElement = document.getElementById('minutes');
@@ -167,16 +171,10 @@
 
         // Recuperar a data de início ou definir agora
         let startTime = localStorage.getItem('startTime');
-        if (!startTime) {
-            startTime = new Date().toISOString();
-            localStorage.setItem('startTime', startTime);
-        } else {
-            startTime = new Date(startTime);
-        }
 
         function updateTimer() {
             const now = new Date();
-            const elapsed = Math.floor((now - startTime) / 1000); // Tempo total em segundos
+            const elapsed = Math.floor((now - new Date(startTime)) / 1000); // Tempo total em segundos
 
             let days = Math.floor(elapsed / (24 * 60 * 60));
             let hours = Math.floor((elapsed % (24 * 60 * 60)) / 3600);
@@ -189,47 +187,28 @@
             secondsElement.textContent = String(seconds).padStart(2, '0');
         }
 
-        function sendToServer() {
-            const now = new Date();
-            const elapsed = Math.floor((now - startTime) / 1000);
-
-            fetch('https://seuservidor.com/salvar-cronometro', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ totalSeconds: elapsed })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Erro ao salvar no servidor:', response.statusText);
-                }
-            })
-            .catch(error => console.error('Erro na requisição:', error));
-        }
-
         function startTimer() {
-            setInterval(() => {
-                updateTimer();
-
-                // Enviar para o servidor a cada 10 minutos
-                if (new Date().getSeconds() % 600 === 0) {
-                    sendToServer();
-                }
-            }, 1000); // 1 segundo em milissegundos
+            setInterval(updateTimer, 1000); // Atualizar a cada segundo
         }
 
-        // resetButton.addEventListener('click', () => {
-        //     localStorage.removeItem('startTime');
-        //     startTime = new Date().toISOString();
-        //     localStorage.setItem('startTime', startTime);
-        //     updateTimer();
-        //     sendToServer();
-        // });
+        startButton.addEventListener('click', () => {
+            if (!startTime) {
+                startTime = new Date().toISOString();
+                localStorage.setItem('startTime', startTime);
+            }
+            updateTimer();
+            startTimer();
 
-        // Atualiza o cronômetro e inicia automaticamente ao carregar a página
-        updateTimer();
-        startTimer();
+            // Esconder o botão iniciar
+            startButton.style.display = 'none';
+        });
+
+        // Se já existe um tempo salvo, iniciar automaticamente
+        if (startTime) {
+            updateTimer();
+            startTimer();
+            startButton.style.display = 'none';
+        }
     </script>
 </body>
 </html>
