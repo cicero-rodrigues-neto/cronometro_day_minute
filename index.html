@@ -203,6 +203,7 @@
             pointer-events: none;
             z-index: 1000;
         }
+
     </style>
 </head>
 <body>
@@ -229,9 +230,6 @@
                 <label>Segundos</label>
             </div>
         </div>
-        <div class="buttons">
-            <button id="start">Iniciar</button>
-        </div>
 
         <div class="calendar-container">
             <div class="calendar-header">
@@ -245,52 +243,43 @@
     </div>
 
     <script>
-        let startButton = document.getElementById('start');
-        let daysElement = document.getElementById('days');
-        let hoursElement = document.getElementById('hours');
-        let minutesElement = document.getElementById('minutes');
-        let secondsElement = document.getElementById('seconds');
-    
-        // Recuperar a data de início ou definir agora
-        let startTime = localStorage.getItem('startTime');
-    
-        function updateTimer() {
+        function getDynamic15thDate() {
             const now = new Date();
-            const elapsed = Math.floor((now - new Date(startTime)) / 1000); // Tempo total em segundos
-    
-            let days = Math.floor(elapsed / (24 * 60 * 60));
-            let hours = Math.floor((elapsed % (24 * 60 * 60)) / 3600);
-            let minutes = Math.floor((elapsed % 3600) / 60);
-            let seconds = elapsed % 60;
-    
-            daysElement.textContent = String(days).padStart(2, '0');
-            hoursElement.textContent = String(hours).padStart(2, '0');
-            minutesElement.textContent = String(minutes).padStart(2, '0');
-            secondsElement.textContent = String(seconds).padStart(2, '0');
-        }
-    
-        function startTimer() {
-            setInterval(updateTimer, 1000); // Atualizar a cada segundo
-        }
-    
-        startButton.addEventListener('click', () => {
-            if (!startTime) {
-                startTime = new Date().toISOString();
-                localStorage.setItem('startTime', startTime);
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            if (now.getDate() >= 15) {
+                // Retorna o dia 15 do mês atual
+                return new Date(year, month, 15);
+            } else {
+                // Retorna o dia 15 do mês anterior
+                const lastMonth = month === 0 ? 11 : month - 1; // Ajusta para o mês anterior
+                const lastYear = month === 0 ? year - 1 : year; // Ajusta o ano se for janeiro
+                return new Date(lastYear, lastMonth, 15);
             }
-            updateTimer();
-            startTimer();
-    
-            // Esconder o botão iniciar
-            startButton.style.display = 'none';
-        });
-    
-        // Se já existe um tempo salvo, iniciar automaticamente
-        if (startTime) {
-            updateTimer();
-            startTimer();
-            startButton.style.display = 'none';
         }
+
+        function updateTimer() {
+            const startDate = getDynamic15thDate();
+            const now = new Date();
+            const elapsedTime = now - startDate; // Tempo decorrido em milissegundos
+
+            const days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((elapsedTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+            document.getElementById("days").textContent = String(days).padStart(2, '0');
+            document.getElementById("hours").textContent = String(hours).padStart(2, '0');
+            document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+        }
+
+        // Atualizar o cronômetro a cada segundo
+        setInterval(updateTimer, 1000);
+
+        // Inicializar o cronômetro
+        updateTimer();
 
         const calendarDays = document.getElementById("calendarDays");
         const monthYear = document.getElementById("monthYear");
