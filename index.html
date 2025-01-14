@@ -131,6 +131,78 @@
         #start {
             display: block;
         }
+
+        .calendar-container {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 350px;
+            padding: 20px 0;
+            display: inline-grid;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .calendar-day {
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .calendar-day.today {
+            background-color: #000000;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.heart {
+            position: relative;
+            background-color: #ffcccb;
+            color: red;
+            font-weight: bold;
+        }
+
+        .calendar-day.heart::after {
+            content: '❤️';
+            position: absolute;
+            top: 1px;
+            right: 2px;
+            font-size: 1.6rem;
+        }
+
+        .calendar-day:hover {
+            background-color: #f0f0f0;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +232,16 @@
         <div class="buttons">
             <button id="start">Iniciar</button>
         </div>
+
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <h2 id="monthYear"></h2>
+            </div>
+            <div class="calendar-days" id="calendarDays">
+                <!-- Os dias do calendário serão inseridos aqui via JavaScript -->
+            </div>
+
+            <canvas id="confetti-canvas"></canvas>
     </div>
 
     <script>
@@ -209,7 +291,88 @@
             startTimer();
             startButton.style.display = 'none';
         }
+
+        const calendarDays = document.getElementById("calendarDays");
+        const monthYear = document.getElementById("monthYear");
+        const confettiCanvas = document.getElementById("confetti-canvas");
+
+        let currentDate = new Date();
+
+        function renderCalendar(date) {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            monthYear.textContent = `${monthNames[month]} ${year}`;
+            calendarDays.innerHTML = "";
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const firstDayOfWeek = firstDayOfMonth.getDay();
+            const totalDaysInMonth = lastDayOfMonth.getDate();
+
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyCell = document.createElement("div");
+                calendarDays.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= totalDaysInMonth; day++) {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("calendar-day");
+
+                if (day === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                    dayElement.classList.add("today");
+                }
+
+                if (day === 15) {
+                    dayElement.classList.add("heart");
+                    dayElement.innerHTML = `<span>${day}</span>`;
+                } else {
+                    dayElement.textContent = day;
+                }
+
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        function startConfetti() {
+            // Inicia confetes no dia 15
+            const interval = 5000; // Dispara confetes a cada 5 segundos (5000 milissegundos)
+            
+            setInterval(() => {
+                confetti.create(confettiCanvas, {
+                    resize: true,
+                    useWorker: true
+                })({
+                    particleCount: 200,
+                    spread: 50,
+                    origin: { y: 0.5 }
+                });
+            }, interval);
+        }
+
+        // Verificar se o dia 15 é hoje
+        function checkDayForConfetti() {
+            const today = new Date();
+            if (today.getDate() === 13) {
+                startConfetti();
+            }
+        }
+
+        renderCalendar(currentDate);
+        checkDayForConfetti();
+
+        // Atualizar a cada dia
+        setInterval(() => {
+            const today = new Date();
+            if (today.getDate() !== currentDate.getDate() || today.getMonth() !== currentDate.getMonth() || today.getFullYear() !== currentDate.getFullYear()) {
+                currentDate = today;
+                renderCalendar(currentDate);
+                checkDayForConfetti();
+            }
+        }, 60000); // Verificar a cada minuto
+
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti"></script>
     </body>
     </html>
     
