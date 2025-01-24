@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/fe6210bf7d.js" crossorigin="anonymous"></script>
+    <title>Feed de Notícias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #E4E4E4;
+        }
+
+        /* Estilo da navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Escondida fora da tela */
+            width: 250px;
+            height: 100%;
+            background-color: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            transition: left 0.3s;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 0px;
+            margin: 10px 0;
+            width: 100%;
+            text-align: center;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+        }
+
+        /* Botão para abrir a navbar */
+        .menu-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #3333337f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        .menu-button:hover {
+            background-color: #575757;
+        }
+
+        /* Quando a navbar está visível */
+        .navbar.active {
+            left: 0;
+        }
+
+
+        .feed-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feed-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .post {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: #007bff;
+        }
+
+        .post p {
+            margin: 0;
+        }
+
+        .post time {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .no-posts {
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Botão para abrir o menu -->
+    <button class="menu-button" id="menuButton">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar Oculta -->
+    <div class="navbar" id="navbar">
+        <a href="index.html">
+            <i class="fas fa-calendar-alt"></i> Home
+        </a>
+        <a href="feed.html">
+            <i class="fas fa-newspaper"></i> Feed
+        </a>
+        <a href="editor.html">
+            <i class="fas fa-edit"></i> Criar Evento
+        </a>
+    </div>
+
+    <div class="feed-container">
+        <h1>Feed Anna e Cicero</h1>
+        <div id="feedContent"></div>
+    </div>
+
+    <script>
+        // Abrir e fechar a navbar
+        const menuButton = document.getElementById("menuButton");
+        const navbar = document.getElementById("navbar");
+
+        menuButton.addEventListener("click", () => {
+            navbar.classList.toggle("active");
+        });
+        const feedContent = document.getElementById("feedContent");
+        const events = JSON.parse(localStorage.getItem("events")) || {};
+
+        function renderFeed() {
+            const sortedDates = Object.keys(events).sort();
+
+            if (sortedDates.length === 0) {
+                feedContent.innerHTML = `<p class="no-posts">Nenhuma publicação disponível.</p>`;
+                return;
+            }
+
+            sortedDates.forEach(date => {
+                const { title, description } = events[date];
+                const post = document.createElement("div");
+                post.className = "post";
+
+                post.innerHTML = `
+                    <h3>${title}</h3>
+                    <p>${description}</p>
+                    <time>${new Date(date).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    })}</time>
+                `;
+
+                feedContent.appendChild(post);
+            });
+        }
+
+        renderFeed();
+    </script>
+</body>
+</html>
