@@ -52,61 +52,6 @@
             padding: 0 20px;
         }
 
-        /* Estilo da navbar */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: -250px; /* Escondida fora da tela */
-            width: 250px;
-            height: 100%;
-            background-color: #333;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-            transition: left 0.3s;
-        }
-
-        .navbar a {
-            text-decoration: none;
-            color: white;
-            padding: 10px 0px;
-            margin: 10px 0;
-            width: 100%;
-            text-align: center;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .navbar a:hover {
-            background-color: #575757;
-        }
-
-        /* Botão para abrir a navbar */
-        .menu-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #3333337f;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1000;
-            transition: background-color 0.3s;
-        }
-
-        .menu-button:hover {
-            background-color: #575757;
-        }
-
-        /* Quando a navbar está visível */
-        .navbar.active {
-            left: 0;
-        }
 
         .calendar-container {
             margin-top: 60px;
