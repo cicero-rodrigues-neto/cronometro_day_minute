@@ -52,62 +52,6 @@
             padding: 0 20px;
         }
 
-        /* Estilo da navbar */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: -250px; /* Escondida fora da tela */
-            width: 250px;
-            height: 100%;
-            background-color: #333;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-            transition: left 0.3s;
-        }
-
-        .navbar a {
-            text-decoration: none;
-            color: white;
-            padding: 10px 0px;
-            margin: 10px 0;
-            width: 100%;
-            text-align: center;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .navbar a:hover {
-            background-color: #575757;
-        }
-
-        /* Botão para abrir a navbar */
-        .menu-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #3333337f;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1000;
-            transition: background-color 0.3s;
-        }
-
-        .menu-button:hover {
-            background-color: #575757;
-        }
-
-        /* Quando a navbar está visível */
-        .navbar.active {
-            left: 0;
-        }
-
         .calendar-container {
             margin-top: 60px;
             text-align: center;
@@ -269,25 +213,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Botão para abrir o menu -->
-    <button class="menu-button" id="menuButton">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Navbar Oculta -->
-    <div class="navbar" id="navbar">
-        <a href="index.html">
-            <i class="fas fa-calendar-alt"></i> Home
-        </a>
-        <a href="feed.html">
-            <i class="fas fa-newspaper"></i> Feed
-        </a>
-        <a href="editor.html">
-            <i class="fas fa-edit"></i> Criar Evento
-        </a>
-    </div>
-
     <div class="image-casal">
         <img src="./assets/WhatsApp_Image_2024-12-12_at_10.02.17-removebg-preview.png" alt="Anna e Cicero">
     </div>
@@ -324,13 +249,6 @@
     </div>
 
     <script>
-        // Abrir e fechar a navbar
-        const menuButton = document.getElementById("menuButton");
-        const navbar = document.getElementById("navbar");
-
-        menuButton.addEventListener("click", () => {
-            navbar.classList.toggle("active");
-        });
         function getDynamic15thDate() {
             const now = new Date();
             const year = now.getFullYear();
